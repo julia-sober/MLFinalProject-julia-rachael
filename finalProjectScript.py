@@ -23,6 +23,7 @@ import IPython.display as ipd
 import os
 
 
+# code adapted from https://www.hackersrealm.net/post/extract-features-from-audio-mfcc-python
 def feature_extraction(file_path):
     # load the audio file
     x, sample_rate = librosa.load(file_path, res_type='kaiser_fast')
