@@ -22,7 +22,6 @@ import librosa.display
 import IPython.display as ipd
 import os
 
-
 # code adapted from https://www.hackersrealm.net/post/extract-features-from-audio-mfcc-python
 def feature_extraction(file_path):
     # load the audio file
@@ -31,3 +30,11 @@ def feature_extraction(file_path):
     mfcc = np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=50).T, axis=0)
     
     return mfcc
+
+features = {}
+directory = 'mircophone-sampling/TestingSamples/WateringCan/'
+for audio in os.listdir(directory):
+    audio_path = directory+audio
+    features[audio_path] = feature_extraction(audio_path)
+
+
