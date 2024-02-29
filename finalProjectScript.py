@@ -21,3 +21,12 @@ import librosa
 import librosa.display
 import IPython.display as ipd
 import os
+
+
+def feature_extraction(file_path):
+    # load the audio file
+    x, sample_rate = librosa.load(file_path, res_type='kaiser_fast')
+    # extract features from the audio
+    mfcc = np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=50).T, axis=0)
+    
+    return mfcc
