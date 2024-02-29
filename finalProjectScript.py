@@ -15,3 +15,9 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import PCA
+
+# imports for feature extraction
+import librosa
+import librosa.display
+import IPython.display as ipd
+import os
