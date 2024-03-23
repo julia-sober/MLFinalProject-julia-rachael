@@ -9,15 +9,15 @@ from scipy import signal
 
 def wav_to_ACC(folder_path):
     acc_list = []
-    #os.listdir gets all files in the specified directory
+    # os.listdir gets all files in the specified directory
     for filename in os.listdir(folder_path):
-        #Load the audio file (filename) - TODO: Look up what data_a is!
+        # Load the audio file (filename) - TODO: Look up what data_a is!
         _, data_a = wavfile.read(filename)
-        #Convert data_a to a float
+        # Convert data_a to a float
         data_a = np.float32(data_a)
 
         corr = signal.correlate(data_a, data_a)
-        #TODO: Look up
+        # TODO: Look up
         lags = signal.correlation_lags(len(data_a), len(data_a))
 
         corr = corr / np.max(corr)
@@ -26,10 +26,14 @@ def wav_to_ACC(folder_path):
         print(lag, np.max(corr))
         acc_list.append(lag, np.max(corr))
 
+def wav_to_ZCR(folder_path):
+    zcr_list = []
+    for filename in os.listdir(folder_path):
+        x, sr = librosa.load(filename)
+        zcr = librosa.feature.zero_crossing_rate(x, frame_length=2048, hop_length=512)
+        zcr_list.append(zcr)
 
-
-
-
+    return zcr_list
 
 light_rain = wav_to_ACC("/microphone-sampling/TestingSamples/lightShower")
 medium_rain = wav_to_ACC("/microphone-sampling/TestingSamples/mediumShower")
