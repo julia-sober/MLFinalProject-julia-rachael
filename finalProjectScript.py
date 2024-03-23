@@ -22,6 +22,21 @@ import IPython.display as ipd
 import os
 
 # code adapted from https://www.hackersrealm.net/post/extract-features-from-audio-mfcc-python
+'''
+Need to:
+    -Get the files (load them from the GitHub repository)
+    -Extract the audio signal (in that in a function for the others? Do we do it first, separately?)
+    -Get the features from each file
+        *Zero crossing rate (Librosa)
+        *Autocorrelation coefficient (Pandas) 
+    (Note: We want to label each type as heavy rain, light rain, silent, etc.)
+    -Train_test_split (
+    -Run SVM
+    -Leave one out cross validation of 10-fold cross validation?    
+    
+''''
+
+
 def feature_extraction(file_path):
     # load the audio file
     x, sample_rate = librosa.load(file_path, res_type='kaiser_fast')
