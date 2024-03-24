@@ -22,23 +22,49 @@ def wav_to_ACC_and_ZCR(folder_path):
     # os.listdir gets all files in the specified directory
     #count = 0
     for filename in os.listdir(folder_path):
+        #Librosa/File setup
         full_path = os.path.join(folder_path, filename)
-        #plot_zcr(full_path)
         x, sr = librosa.load(full_path)
-        zcr = librosa.feature.zero_crossing_rate(x)
-        print(zcr)
-        zcr_list.append(zcr)
-        auto = sm.tsa.acf(x, nlags=2000)
-        acc_list.append(auto)
+
+        #Zero Crossing Rate
+        #zcr = librosa.feature.zero_crossing_rate(x)
+        #zcr = zcr.reshape(zcr.shape[1])
+        #print(zcr.shape)
+        #zcr_list += zcr.tolist()
+        #zcr_list.append(zcr)
+
+        num_zero_crossings = librosa.zero_crossings(x, pad = False)
+        zcr_list.append([sum(num_zero_crossings)])
+
+        #Auto Correlation Coefficient
+        acc = sm.tsa.acf(x, nlags=2000)
+        acc_list.append(acc)
+
         #count += 1
 
-    acc_array = np.array(acc_list)
-    #print(acc_array.shape)
-    #zcr_array = np.array(zcr_list)
-    #print(zcr_array.shape)
 
-    #combined_array = np.concatenate((acc_array, zcr_array))
+    #Use this code block is using num ZCR
+    acc_array = np.array(acc_list)
+    zcr_array = np.array(zcr_list)
+    combined_array_acc_numZcr = np.concatenate((acc_array, zcr_array), axis = 1)
+    return combined_array_acc_numZcr
+
+
+    '''
+    # ZCR
+    acc_array = np.array(acc_list)
+    print("acc shape: ", acc_array.shape, "acc: ", acc_array)
+    zcr_array = np.array(zcr_list)
+    print("zcr shape: ", zcr_array.shape, "zcr: ", zcr_array)
+    print("acc.shape: ", acc.shape, "zcr.shape: ", zcr.shape)
+    combined_array_acc_zcr = np.concatenate((acc_array, zcr_array))
+    # print(combined_array)
     return acc_array
+    # return zcr_array
+    # return combined_array
+    '''
+
+
 
 def plot_zcr(full_path):
     x, sr = librosa.load(full_path)
