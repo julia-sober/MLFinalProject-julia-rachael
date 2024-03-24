@@ -9,6 +9,8 @@ import IPython.display as ipd
 import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
+from sklearn.svm import SVC
+from sklearn.model_selection import LeaveOneOut
 from scipy.signal import find_peaks
 from scipy.io import wavfile
 from scipy import signal
@@ -79,3 +81,29 @@ df = pd.DataFrame(X)
 df['target'] = Y
 print(df)
 
+'''
+Note: This was one way I started to do SVM, but stopped to do the below instead, with Leave One Out Cross Validation.
+I left this in for now in case we would like to reference it later.
+#Beginning ML modeling - TODO: what do we want test_size to be?
+#x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.25, random_state=0)
+#TODO: Test with different kernels? (look at SVC scikit learn page where it says how to tune SVC's hyperparams)
+svc_object = SVC(kernel = 'linear')
+svc_object.fit(x_train, y_train)
+#predicted_svc = svc_object.predict(x_test)
+#How to score?
+'''
+
+svc_object = SVC(kernel = 'linear')
+
+loo = LeaveOneOut()
+accuracies = []
+for train_index, test_index in loo.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    Y_train, Y_test = Y[train_index], Y[test_index]
+
+    svc_object.fit(X_train, Y_train)
+    accuracy = svc_object.score(X_test, Y_test)
+    accuracies.append(accuracy)
+
+mean_accuracy = np.mean(accuracies)
+print("Mean Accuracy: ", mean_accuracy)
