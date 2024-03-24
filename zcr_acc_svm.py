@@ -18,18 +18,19 @@ from scipy import signal
 
 def wav_to_ACC_and_ZCR(folder_path):
     acc_list = []
-    #zcr_list = []
+    zcr_list = []
     # os.listdir gets all files in the specified directory
-    count = 0
+    #count = 0
     for filename in os.listdir(folder_path):
         full_path = os.path.join(folder_path, filename)
         #plot_zcr(full_path)
         x, sr = librosa.load(full_path)
-        #zcr = librosa.feature.zero_crossing_rate(x)
-        #zcr_list.append(zcr)
+        zcr = librosa.feature.zero_crossing_rate(x)
+        print(zcr)
+        zcr_list.append(zcr)
         auto = sm.tsa.acf(x, nlags=2000)
         acc_list.append(auto)
-        count += 1
+        #count += 1
 
     acc_array = np.array(acc_list)
     #print(acc_array.shape)
