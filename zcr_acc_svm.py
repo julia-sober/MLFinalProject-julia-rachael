@@ -113,7 +113,7 @@ X = np.concatenate([light_rain_features,medium_rain_features,heavy_rain_features
 Y = np.concatenate([light_rain_labels, med_rain_labels, heavy_rain_labels, heavy_couscous_labels, light_couscous_labels, mason_rain_labels, nothing_labels], axis=0)
 df = pd.DataFrame(X)
 df['target'] = Y
-print(df)
+#print(df)
 
 '''
 Note: This was one way I started to do SVM, but stopped to do the below instead, with Leave One Out Cross Validation.
