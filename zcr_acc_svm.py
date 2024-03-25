@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier
 import os
 import librosa
 import librosa.feature
@@ -139,4 +140,22 @@ for train_index, test_index in loo.split(X):
     accuracies.append(accuracy)
 
 mean_accuracy = np.mean(accuracies)
-print("Mean Accuracy: ", mean_accuracy)
+print("Mean Accuracy (SVM): ", mean_accuracy)
+
+
+# IMPLEMENTING RANDOM FOREST
+loo = LeaveOneOut()
+accuracies_rf = []
+
+for train_index, test_index in loo.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    Y_train, Y_test = Y[train_index], Y[test_index]
+
+    clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    clf.fit(X_train, Y_train)
+    Y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(Y_test, Y_pred)
+    accuracies_rf.append(accuracy)
+
+mean_accuracy = np.mean(accuracies_rf)
+print("Mean Accuracy (RF): ", mean_accuracy)
