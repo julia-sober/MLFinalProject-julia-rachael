@@ -97,6 +97,8 @@ mason_rain_features = wav_to_ACC_and_ZCR("microphone-sampling/TestingSamples/Mas
 print(mason_rain_features.shape)
 nothing_features = wav_to_ACC_and_ZCR("microphone-sampling/TestingSamples/Nothing/")
 print(nothing_features.shape)
+watering_can_features = wav_to_ACC_and_ZCR("microphone-sampling/TestingSamples/WateringCan/")
+print(watering_can_features.shape)
 
 # Create Labels for Light, Medium, Heavy, etc.
 light_rain_labels = np.full(len(light_rain_features),"light rain")
@@ -106,14 +108,15 @@ heavy_couscous_labels = np.full(len(heavy_couscous_features),"heavy couscous hai
 light_couscous_labels = np.full(len(light_couscous_features),"light couscous hail")
 mason_rain_labels = np.full(len(mason_rain_features),"mason jar rain")
 nothing_labels = np.full(len(nothing_features),"nothing")
+watering_can_labels = np.full(len(watering_can_features),"watering can")
 
 # Concatenate together the 7 NumPy arrays into one array, which will be the features array
-X = np.concatenate([light_rain_features,medium_rain_features,heavy_rain_features,heavy_couscous_features,light_couscous_features,mason_rain_features,nothing_features], axis=0)
+X = np.concatenate([light_rain_features,medium_rain_features,heavy_rain_features,heavy_couscous_features,light_couscous_features,mason_rain_features,nothing_features,watering_can_features], axis=0)
 # Concatenate together the 7 NumPy LABEL arrays into one array, which will be the target array
-Y = np.concatenate([light_rain_labels, med_rain_labels, heavy_rain_labels, heavy_couscous_labels, light_couscous_labels, mason_rain_labels, nothing_labels], axis=0)
+Y = np.concatenate([light_rain_labels, med_rain_labels, heavy_rain_labels, heavy_couscous_labels, light_couscous_labels, mason_rain_labels, nothing_labels, watering_can_labels], axis=0)
 df = pd.DataFrame(X)
 df['target'] = Y
-#print(df)
+print(df)
 
 '''
 Note: This was one way I started to do SVM, but stopped to do the below instead, with Leave One Out Cross Validation.
