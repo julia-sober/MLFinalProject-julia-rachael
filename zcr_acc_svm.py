@@ -1,20 +1,15 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
-import os
 import librosa
-import librosa.feature
 import librosa.display
-import IPython.display as ipd
-import numpy as np
-import statsmodels.api as sm
+import librosa.feature
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import LeaveOneOut, train_test_split
 from sklearn.svm import SVC
-from sklearn.model_selection import LeaveOneOut
-from scipy.signal import find_peaks
-from scipy.io import wavfile
-from scipy import signal
+import statsmodels.api as sm
 
 def wav_to_ACC_and_ZCR(folder_path):
     acc_list = []
