@@ -142,6 +142,13 @@ for train_index, test_index in loo.split(X):
 mean_accuracy = np.mean(accuracies)
 print("Mean Accuracy (SVM): ", mean_accuracy)
 
+# SVM without LOO
+svc_object = SVC(kernel='linear')
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+svc_object.fit(X_train, Y_train)
+accuracy = svc_object.score(X_test, Y_test)
+print("Accuracy (SVM no LOO):", accuracy)
+
 
 # IMPLEMENTING RANDOM FOREST
 loo = LeaveOneOut()
@@ -159,3 +166,11 @@ for train_index, test_index in loo.split(X):
 
 mean_accuracy = np.mean(accuracies_rf)
 print("Mean Accuracy (RF): ", mean_accuracy)
+
+# Random Forest without leave one out
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train, Y_train)
+Y_pred = clf.predict(X_test)
+accuracy = accuracy_score(Y_test, Y_pred)
+print("Accuracy (RF no LOO):", accuracy)
