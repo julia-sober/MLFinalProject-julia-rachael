@@ -33,8 +33,11 @@ def wav_to_ACC_and_ZCR(folder_path):
         #zcr_list += zcr.tolist()
         #zcr_list.append(zcr)
 
-        num_zero_crossings = librosa.zero_crossings(x, pad = False)
-        zcr_list.append([sum(num_zero_crossings)])
+        zero_crossings = librosa.feature.zero_crossing_rate(x, pad=False)
+        #zcr_list.append([sum(num_zero_crossings)])
+        # pads zcr array with 0's so we can concatenate it with acc
+        fixed_length_zcr = librosa.util.fix_length(zero_crossings[0], size=1000, mode='edge')
+        zcr_list.append(fixed_length_zcr)
 
         #Auto Correlation Coefficient
         acc = sm.tsa.acf(x, nlags=2000)
@@ -45,9 +48,12 @@ def wav_to_ACC_and_ZCR(folder_path):
 
     #Use this code block is using num ZCR
     acc_array = np.array(acc_list)
+    #print("acc shape: ", acc_array.shape, "acc: ", acc_array)
     zcr_array = np.array(zcr_list)
-    combined_array_acc_numZcr = np.concatenate((acc_array, zcr_array), axis = 1)
-    return combined_array_acc_numZcr
+    #print("zcr shape: ", zcr_array.shape, "zcr: ", zcr_array)
+    combined_array_acc_zcr = np.concatenate((acc_array, zcr_array), axis=1)
+    #print("combined shape: ", combined_array_acc_zcr.shape, "zcr: ", combined_array_acc_zcr)
+    return combined_array_acc_zcr
 
 
     '''
@@ -120,7 +126,7 @@ svc_object.fit(x_train, y_train)
 #How to score?
 '''
 
-svc_object = SVC(kernel = 'linear')
+svc_object = SVC(kernel='linear')
 
 loo = LeaveOneOut()
 accuracies = []
