@@ -147,9 +147,12 @@ print("Accuracy (RF no LOO):", accuracy_RF)
 # Plotting accuracies
 methods = ['SVM', 'SVM (w/o CV)', 'Random Forest', 'Random Forest (w/o CV)']
 plt.figure(figsize=(10, 6))
-plt.bar(methods, all_accuracies, color=['blue', 'orange', 'yellow', 'pink'])
-plt.title('Accuracy Comparison')
+bars = plt.bar(methods, all_accuracies, color=['blue', 'orange', 'yellow', 'pink'])
+plt.title('Accuracy Comparison ZCR and ACC')
 plt.xlabel('Method')
 plt.ylabel('Accuracy')
-plt.ylim(0.7, 1)
+plt.ylim(0, 1)
+for bar, accuracy in zip(bars, all_accuracies):
+    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{accuracy:.2f}', ha='center', va='bottom')
+plt.savefig('images/ZCR_ACC_SVM_RF_Graph.png')
 plt.show()
