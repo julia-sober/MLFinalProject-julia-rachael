@@ -30,8 +30,17 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import LeaveOneOut, train_test_split
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
+from sklearn.datasets import make_classification
 from sklearn.inspection import permutation_importance
 import statsmodels.api as sm
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras import optimizers
 import maad
 from maad.features import temporal_entropy
 from maad.features import spectral_entropy
@@ -58,6 +67,7 @@ def main():
     # print(nothing_features.shape)
     watering_can_features = wav_to_audio_features("microphone-sampling/TestingSamples/WateringCan/")
     # print(watering_can_features.shape)
+    real_snow_features = wav_to_audio_features("microphone-sampling/TestingSamples/RealSnow/")
 
     
     #--------------------Create Labels for Light, Medium, Heavy, etc.-------------------------------------
@@ -68,15 +78,16 @@ def main():
     mason_rain_labels = np.full(len(mason_rain_features), "mason jar rain")
     nothing_labels = np.full(len(nothing_features), "nothing")
     watering_can_labels = np.full(len(watering_can_features), "watering can")
+    real_snow_labels = np.full(len(real_snow_features), "real snow")
 
     #----------------------Concatenating the features and labels into X (features) and Y (labels)----------------
     # Concatenate together the 8 NumPy arrays into one array, which will be the features array
     X = np.concatenate([light_rain_features, medium_rain_features, heavy_couscous_features,
-                        light_couscous_features, mason_rain_features, nothing_features, watering_can_features], axis=0)
+                        light_couscous_features, mason_rain_features, nothing_features, watering_can_features, real_snow_features], axis=0)
     # Concatenate together the 8 NumPy LABEL arrays into one array, which will be the target array
     Y = np.concatenate(
         [light_rain_labels, med_rain_labels, heavy_couscous_labels, light_couscous_labels,
-         mason_rain_labels, nothing_labels, watering_can_labels], axis=0)
+         mason_rain_labels, nothing_labels, watering_can_labels, real_snow_labels], axis=0)
     df = pd.DataFrame(X)
     df['target'] = Y
 
@@ -264,32 +275,11 @@ def run_models(X, Y):
 
     '''
     #-------------------------IMPLEMENTING XgBoost--------------------------------------
-
-    print("In XGBOOST")
-    '''
-    loo = LeaveOneOut()
-    accuracies_xgboost = []
-
-    for train_index, test_index in loo.split(X):
-        X_train, X_test = X[train_index], X[test_index]
-        Y_train, Y_test = Y[train_index], Y[test_index]
-
-        #clf = xgb.XGBClassifier(n_estimators=100, random_state=42)
-        xgclf = GradientBoostingClassifier(n_estimators=100, random_state=42)
-        xgclf.fit(X_train, Y_train)
-        Y_pred = xgclf.predict(X_test)
-        accuracy = accuracy_score(Y_test, Y_pred)
-        accuracies_xgboost.append(accuracy)
-
-    mean_accuracy_XG_LOO = np.mean(accuracies_xgboost)
-    all_accuracies.append(mean_accuracy_XG_LOO)
-    print("Mean Accuracy (XGBoost): ", mean_accuracy_XG_LOO)
-    '''
     # XGBoost without leave one out
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
-    xgclf2 = GradientBoostingClassifier(n_estimators=100, random_state=42)
-    xgclf2.fit(X_train, Y_train)
-    Y_pred = xgclf2.predict(X_test)
+    xgclf = GradientBoostingClassifier(n_estimators=100, random_state=42)
+    xgclf.fit(X_train, Y_train)
+    Y_pred = xgclf.predict(X_test)
     accuracy_XG = accuracy_score(Y_test, Y_pred)
     all_accuracies.append(accuracy_XG)
     print("Accuracy (XGBoost no LOO):", accuracy_XG)
@@ -303,42 +293,44 @@ def run_models(X, Y):
     # Convert the model to a native API model
     #model = xgb_classifier.get_booster()
 
-    '''
     #-------------------------Implementing Logistic Regression--------------------------------------
-    print("In Log Reg")
-    loo = LeaveOneOut()
-    accuracies_lr = []
-
-    #Logistic Regression Leave One Out
-    for train_index, test_index in loo.split(X):
-        X_train, X_test = X[train_index], X[test_index]
-        Y_train, Y_test = Y[train_index], Y[test_index]
-
-        lrclf = LogisticRegression(random_state=0, max_iter=100)
-        lrclf.fit(X_train, Y_train)
-        Y_pred = lrclf.predict(X_test)
-        accuracy = accuracy_score(Y_test, Y_pred)
-        accuracies_lr.append(accuracy)
-
-    mean_accuracy_LR_LOO = np.mean(accuracies_lr)
-    all_accuracies.append(mean_accuracy_LR_LOO)
-    print("Mean Accuracy (LR): ", mean_accuracy_LR_LOO)
-
     # Logistic Regression without leave one out
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
-    lrclf2 = LogisticRegression(random_state=0, max_iter=100) #TODO: Change random_state?
-    lrclf2.fit(X_train, Y_train)
-    Y_pred = lrclf2.predict(X_test)
+    lrclf = LogisticRegression(random_state=0, max_iter=100) #TODO: Change random_state?
+    lrclf.fit(X_train, Y_train)
+    Y_pred = lrclf.predict(X_test)
     accuracy_LR = accuracy_score(Y_test, Y_pred)
     all_accuracies.append(accuracy_LR)
     print("Accuracy (LR no LOO):", accuracy_LR)
-    '''
+
+    # -------------------------Implementing Artificial Neural Network--------------------------------
+    xtrain, xtest, ytrain, ytest = train_test_split(X, Y, test_size=0.3, random_state=42)
+    xtrain, xval, ytrain, yval = train_test_split(xtrain, ytrain, test_size=0.2, random_state=0)
+    ytrain_1hot = tf.keras.utils.to_categorical(Y_train, num_classes=8)
+    yval_1hot = tf.keras.utils.to_categorical(yval, num_classes=8)
+    ytest_1hot = tf.keras.utils.to_categorical(ytest, num_classes=8)
+    layers = [
+        Flatten(input_shape=(32, 32, 3)),
+        # Hidden layer with 100 neurons and relu activation
+        Dense(100, activation="relu"),
+        # Output layer with 10 neurons for 10 classes and softmax activation
+        Dense(10, activation="softmax")
+    ]
+
+    model = Sequential(layers)
+
+    # refer to https://www.tensorflow.org/tutorials/keras/classification tutorial to check on how to use compile function
+    model.compile(optimizer='SGD', loss="categorical_crossentropy", metrics=['accuracy'])
+
+    # This will start the training and save each epoch output in the history list.
+    history = model.fit(xtrain, ytrain_1hot, batch_size=16, epochs=10, validation_data=(xval, yval_1hot))
+
     return all_accuracies
 
 def plot_accuracies(all_accuracies):
     #-------------------------Plotting accuracies---------------------------------------------------
     # Plotting accuracies
-    methods = ['SVM', 'SVM (w/o CV)', 'Random Forest', 'Random Forest (w/o CV)', 'Logistic Regression', 'Logistic Regression (w/o CV)']
+    methods = ['SVM', 'SVM (w/o CV)', 'Random Forest', 'Random Forest (w/o CV)', 'Logistic Regression (w/o CV)', 'XGBoost (w/o CV)']
     plt.figure(figsize=(30, 10))
     bars = plt.bar(methods, all_accuracies, color=['blue', 'orange', 'yellow', 'pink', 'purple', 'green'])
     plt.title('Accuracy Comparison All Audio Features')
