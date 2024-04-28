@@ -10,6 +10,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import LeaveOneOut, train_test_split
+from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 import statsmodels.api as sm
 import maad
@@ -71,21 +72,21 @@ def wav_to_Ht_Hf(folder_path):
 
 # light_rain, medium_rain, etc. contains the acc_array and zcr_array, concatenated, after the function returns
 # So, these will contain the features
-light_rain_features = wav_to_Ht_Hf("../microphone-sampling/TestingSamples/lightShower/")
+light_rain_features = wav_to_Ht_Hf("microphone-sampling/TestingSamples/lightShower/")
 #print(light_rain_features.shape)
-medium_rain_features = wav_to_Ht_Hf("../microphone-sampling/TestingSamples/mediumShower/")
+medium_rain_features = wav_to_Ht_Hf("microphone-sampling/TestingSamples/mediumShower/")
 #print(medium_rain_features.shape)
-heavy_rain_features = wav_to_Ht_Hf("../microphone-sampling/TestingSamples/heavyShower/")
+heavy_rain_features = wav_to_Ht_Hf("microphone-sampling/TestingSamples/heavyShower/")
 #print(heavy_rain_features.shape)
-heavy_couscous_features = wav_to_Ht_Hf("../microphone-sampling/TestingSamples/heavyCouscousHail/")
+heavy_couscous_features = wav_to_Ht_Hf("microphone-sampling/TestingSamples/heavyCouscousHail/")
 #print(heavy_couscous_features.shape)
-light_couscous_features = wav_to_Ht_Hf("../microphone-sampling/TestingSamples/lightCouscousHail/")
+light_couscous_features = wav_to_Ht_Hf("microphone-sampling/TestingSamples/lightCouscousHail/")
 #print(light_couscous_features.shape)
-mason_rain_features = wav_to_Ht_Hf("../microphone-sampling/TestingSamples/MasonJarRain/")
+mason_rain_features = wav_to_Ht_Hf("microphone-sampling/TestingSamples/MasonJarRain/")
 #print(mason_rain_features.shape)
-nothing_features = wav_to_Ht_Hf("../microphone-sampling/TestingSamples/Nothing/")
+nothing_features = wav_to_Ht_Hf("microphone-sampling/TestingSamples/Nothing/")
 #print(nothing_features.shape)
-watering_can_features = wav_to_Ht_Hf("../microphone-sampling/TestingSamples/WateringCan/")
+watering_can_features = wav_to_Ht_Hf("microphone-sampling/TestingSamples/WateringCan/")
 #print(watering_can_features.shape)
 
 # Create Labels for Light, Medium, Heavy, etc.
@@ -234,6 +235,35 @@ accuracy_RF = accuracy_score(Y_test, Y_pred)
 all_accuracies.append(accuracy_RF)
 print("Accuracy (RF no LOO):", accuracy_RF)
 '''
+
+
+#-------------------------Implementing Logistic Regression--------------------------------------
+print("In Log Reg")
+loo = LeaveOneOut()
+accuracies_lr = []
+
+#Logistic Regression Leave One Out
+for train_index, test_index in loo.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    Y_train, Y_test = Y[train_index], Y[test_index]
+    lrclf = LogisticRegression(random_state=0, max_iter=100)
+    lrclf.fit(X_train, Y_train)
+    Y_pred = lrclf.predict(X_test)
+    accuracy = accuracy_score(Y_test, Y_pred)
+    accuracies_lr.append(accuracy)
+
+mean_accuracy_LR_LOO = np.mean(accuracies_lr)
+all_accuracies.append(mean_accuracy_LR_LOO)
+print("Mean Accuracy (LR): ", mean_accuracy_LR_LOO)
+
+# Logistic Regression without leave one out
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+lrclf2 = LogisticRegression(random_state=0, max_iter=100) #TODO: Change random_state?
+lrclf2.fit(X_train, Y_train)
+Y_pred = lrclf2.predict(X_test)
+accuracy_LR = accuracy_score(Y_test, Y_pred)
+all_accuracies.append(accuracy_LR)
+print("Accuracy (LR no LOO):", accuracy_LR)
 #-------------------------Plotting accuracies---------------------------------------------------
 # Plotting accuracies
 methods = ['SVM', 'SVM (w/o CV)', 'Random Forest', 'Random Forest (w/o CV)', 'XGBoost', 'XGBoost (w/o CV)']
