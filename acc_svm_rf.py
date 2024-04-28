@@ -32,21 +32,21 @@ def wav_to_ACC(folder_path):
 
 # light_rain, medium_rain, etc. contains the acc_array and zcr_array, concatenated, after the function returns
 # So, these will contain the features
-light_rain_features = wav_to_ACC("microphone-sampling/TestingSamples/lightShower/")
+light_rain_features = wav_to_ACC("../microphone-sampling/TestingSamples/lightShower/")
 #print(light_rain_features.shape)
-medium_rain_features = wav_to_ACC("microphone-sampling/TestingSamples/mediumShower/")
+medium_rain_features = wav_to_ACC("../microphone-sampling/TestingSamples/mediumShower/")
 #print(medium_rain_features.shape)
-heavy_rain_features = wav_to_ACC("microphone-sampling/TestingSamples/heavyShower/")
+heavy_rain_features = wav_to_ACC("../microphone-sampling/TestingSamples/heavyShower/")
 #print(heavy_rain_features.shape)
-heavy_couscous_features = wav_to_ACC("microphone-sampling/TestingSamples/heavyCouscousHail/")
+heavy_couscous_features = wav_to_ACC("../microphone-sampling/TestingSamples/heavyCouscousHail/")
 #print(heavy_couscous_features.shape)
-light_couscous_features = wav_to_ACC("microphone-sampling/TestingSamples/lightCouscousHail/")
+light_couscous_features = wav_to_ACC("../microphone-sampling/TestingSamples/lightCouscousHail/")
 #print(light_couscous_features.shape)
-mason_rain_features = wav_to_ACC("microphone-sampling/TestingSamples/MasonJarRain/")
+mason_rain_features = wav_to_ACC("../microphone-sampling/TestingSamples/MasonJarRain/")
 #print(mason_rain_features.shape)
-nothing_features = wav_to_ACC("microphone-sampling/TestingSamples/Nothing/")
+nothing_features = wav_to_ACC("../microphone-sampling/TestingSamples/Nothing/")
 #print(nothing_features.shape)
-watering_can_features = wav_to_ACC("microphone-sampling/TestingSamples/WateringCan/")
+watering_can_features = wav_to_ACC("../microphone-sampling/TestingSamples/WateringCan/")
 #print(watering_can_features.shape)
 
 # Create Labels for Light, Medium, Heavy, etc.
