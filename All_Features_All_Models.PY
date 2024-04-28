@@ -38,34 +38,31 @@ from maad.features import spectral_entropy
 import scipy
 from scipy import signal
 
-import xgboost as xgb
+#import xgboost as xgb
 from sklearn.ensemble import GradientBoostingClassifier
 
 def main():
     #--------------Extracting audio features for each category of audio samples-------------------------------
     # light_rain, medium_rain, etc. will contain all of the audio features, concatenated, after the function returns
-    light_rain_features = wav_to_audio_features("../microphone-sampling/TestingSamples/lightShower/")
+    light_rain_features = wav_to_audio_features("microphone-sampling/TestingSamples/lightShower/")
     # print(light_rain_features.shape)
-    medium_rain_features = wav_to_audio_features("../microphone-sampling/TestingSamples/mediumShower/")
+    medium_rain_features = wav_to_audio_features("microphone-sampling/TestingSamples/mediumShower/")
     # print(medium_rain_features.shape)
-    heavy_rain_features = wav_to_audio_features("../microphone-sampling/TestingSamples/heavyShower/")
-    # print(heavy_rain_features.shape)
-    heavy_couscous_features = wav_to_audio_features("../microphone-sampling/TestingSamples/heavyCouscousHail/")
+    heavy_couscous_features = wav_to_audio_features("microphone-sampling/TestingSamples/heavyCouscousHail/")
     # print(heavy_couscous_features.shape)
-    light_couscous_features = wav_to_audio_features("../microphone-sampling/TestingSamples/lightCouscousHail/")
+    light_couscous_features = wav_to_audio_features("microphone-sampling/TestingSamples/lightCouscousHail/")
     # print(light_couscous_features.shape)
-    mason_rain_features = wav_to_audio_features("../microphone-sampling/TestingSamples/MasonJarRain/")
+    mason_rain_features = wav_to_audio_features("microphone-sampling/TestingSamples/MasonJarRain/")
     # print(mason_rain_features.shape)
-    nothing_features = wav_to_audio_features("../microphone-sampling/TestingSamples/Nothing/")
+    nothing_features = wav_to_audio_features("microphone-sampling/TestingSamples/Nothing/")
     # print(nothing_features.shape)
-    watering_can_features = wav_to_audio_features("../microphone-sampling/TestingSamples/WateringCan/")
+    watering_can_features = wav_to_audio_features("microphone-sampling/TestingSamples/WateringCan/")
     # print(watering_can_features.shape)
 
     
     #--------------------Create Labels for Light, Medium, Heavy, etc.-------------------------------------
     light_rain_labels = np.full(len(light_rain_features), "light rain")
     med_rain_labels = np.full(len(medium_rain_features), "medium rain")
-    heavy_rain_labels = np.full(len(heavy_rain_features), "heavy rain")
     heavy_couscous_labels = np.full(len(heavy_couscous_features), "heavy couscous hail")
     light_couscous_labels = np.full(len(light_couscous_features), "light couscous hail")
     mason_rain_labels = np.full(len(mason_rain_features), "mason jar rain")
@@ -74,11 +71,11 @@ def main():
 
     #----------------------Concatenating the features and labels into X (features) and Y (labels)----------------
     # Concatenate together the 8 NumPy arrays into one array, which will be the features array
-    X = np.concatenate([light_rain_features, medium_rain_features, heavy_rain_features, heavy_couscous_features,
+    X = np.concatenate([light_rain_features, medium_rain_features, heavy_couscous_features,
                         light_couscous_features, mason_rain_features, nothing_features, watering_can_features], axis=0)
     # Concatenate together the 8 NumPy LABEL arrays into one array, which will be the target array
     Y = np.concatenate(
-        [light_rain_labels, med_rain_labels, heavy_rain_labels, heavy_couscous_labels, light_couscous_labels,
+        [light_rain_labels, med_rain_labels, heavy_couscous_labels, light_couscous_labels,
          mason_rain_labels, nothing_labels, watering_can_labels], axis=0)
     df = pd.DataFrame(X)
     df['target'] = Y
@@ -267,8 +264,9 @@ def run_models(X, Y):
 
     '''
     #-------------------------IMPLEMENTING XgBoost--------------------------------------
-    '''
+
     print("In XGBOOST")
+    '''
     loo = LeaveOneOut()
     accuracies_xgboost = []
 
@@ -277,24 +275,24 @@ def run_models(X, Y):
         Y_train, Y_test = Y[train_index], Y[test_index]
 
         #clf = xgb.XGBClassifier(n_estimators=100, random_state=42)
-        clf = GradientBoostingClassifier(n_estimators=100, random_state=42)
-        clf.fit(X_train, Y_train)
-        Y_pred = clf.predict(X_test)
+        xgclf = GradientBoostingClassifier(n_estimators=100, random_state=42)
+        xgclf.fit(X_train, Y_train)
+        Y_pred = xgclf.predict(X_test)
         accuracy = accuracy_score(Y_test, Y_pred)
         accuracies_xgboost.append(accuracy)
 
-    mean_accuracy_RF_LOO = np.mean(accuracies_xgboost)
-    all_accuracies.append(mean_accuracy_RF_LOO)
-    print("Mean Accuracy (XGBoost): ", mean_accuracy_RF_LOO)
-
+    mean_accuracy_XG_LOO = np.mean(accuracies_xgboost)
+    all_accuracies.append(mean_accuracy_XG_LOO)
+    print("Mean Accuracy (XGBoost): ", mean_accuracy_XG_LOO)
+    '''
     # XGBoost without leave one out
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
-    clf = GradientBoostingClassifier(n_estimators=100, random_state=42)
-    clf.fit(X_train, Y_train)
-    Y_pred = clf.predict(X_test)
-    accuracy_RF = accuracy_score(Y_test, Y_pred)
-    all_accuracies.append(accuracy_RF)
-    print("Accuracy (XGBoost no LOO):", accuracy_RF)
+    xgclf2 = GradientBoostingClassifier(n_estimators=100, random_state=42)
+    xgclf2.fit(X_train, Y_train)
+    Y_pred = xgclf2.predict(X_test)
+    accuracy_XG = accuracy_score(Y_test, Y_pred)
+    all_accuracies.append(accuracy_XG)
+    print("Accuracy (XGBoost no LOO):", accuracy_XG)
 
     #TODO: Try using this XGBoost instead?
 
@@ -304,36 +302,37 @@ def run_models(X, Y):
 
     # Convert the model to a native API model
     #model = xgb_classifier.get_booster()
+
     '''
     #-------------------------Implementing Logistic Regression--------------------------------------
     print("In Log Reg")
     loo = LeaveOneOut()
-    accuracies_rf = []
+    accuracies_lr = []
 
-    #Random Forest Leave One Out
+    #Logistic Regression Leave One Out
     for train_index, test_index in loo.split(X):
         X_train, X_test = X[train_index], X[test_index]
         Y_train, Y_test = Y[train_index], Y[test_index]
 
-        clf = LogisticRegression(random_state=0, max_iter = 150)
-        clf.fit(X_train, Y_train)
-        Y_pred = clf.predict(X_test)
+        lrclf = LogisticRegression(random_state=0, max_iter=100)
+        lrclf.fit(X_train, Y_train)
+        Y_pred = lrclf.predict(X_test)
         accuracy = accuracy_score(Y_test, Y_pred)
-        accuracies_rf.append(accuracy)
+        accuracies_lr.append(accuracy)
 
-    mean_accuracy_RF_LOO = np.mean(accuracies_rf)
-    all_accuracies.append(mean_accuracy_RF_LOO)
-    print("Mean Accuracy (LR): ", mean_accuracy_RF_LOO)
+    mean_accuracy_LR_LOO = np.mean(accuracies_lr)
+    all_accuracies.append(mean_accuracy_LR_LOO)
+    print("Mean Accuracy (LR): ", mean_accuracy_LR_LOO)
 
-    # Random Forest without leave one out
+    # Logistic Regression without leave one out
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
-    clf = LogisticRegression(random_state=0, max_iter = 150) #TODO: Change random_state?
-    clf.fit(X_train, Y_train)
-    Y_pred = clf.predict(X_test)
-    accuracy_RF = accuracy_score(Y_test, Y_pred)
-    all_accuracies.append(accuracy_RF)
-    print("Accuracy (LR no LOO):", accuracy_RF)
-
+    lrclf2 = LogisticRegression(random_state=0, max_iter=100) #TODO: Change random_state?
+    lrclf2.fit(X_train, Y_train)
+    Y_pred = lrclf2.predict(X_test)
+    accuracy_LR = accuracy_score(Y_test, Y_pred)
+    all_accuracies.append(accuracy_LR)
+    print("Accuracy (LR no LOO):", accuracy_LR)
+    '''
     return all_accuracies
 
 def plot_accuracies(all_accuracies):
@@ -349,7 +348,6 @@ def plot_accuracies(all_accuracies):
     for bar, accuracy in zip(bars, all_accuracies):
         plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{accuracy:.2f}', ha='center', va='bottom')
     plt.savefig('images/All_Audio_Features_SVM_RF_XGB_LR_Graph.png')
-    plt.show()
 
 if __name__=="__main__":
     main()
