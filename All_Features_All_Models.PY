@@ -276,11 +276,14 @@ def run_models(X, Y):
 
 def plot_accuracies(all_accuracies):
     #-------------------------Plotting accuracies---------------------------------------------------
+    FONT_SIZE = 21
+    plt.rc('font', size=FONT_SIZE)  # controls default text sizes
+
     # Plotting accuracies
-    methods = ['SVM', 'SVM (w/o CV)', 'Random Forest', 'Random Forest (w/o CV)', 'XGBoost', 'XGBoost (w/o CV)', 'Logistic Regression', 'Logistic Regression (w/o CV)']
+    methods = ['SVM', 'SVM (w/o CV)', 'RF', 'RF (w/o CV)', 'XGBoost', 'XGBoost (w/o CV)', 'LR', 'LR (w/o CV)']
     plt.figure(figsize=(30, 10))
-    bars = plt.bar(methods, all_accuracies, color=['blue', 'orange', 'yellow', 'pink', 'purple', 'green', 'red', 'cyan'])
-    plt.title('Accuracy Comparison All Audio Features')
+    bars = plt.bar(methods, all_accuracies, color=['red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple', 'pink'])
+    plt.title('Accuracy Comparison Between Models')
     plt.xlabel('Method')
     plt.ylabel('Accuracy')
     plt.ylim(0, 1)
