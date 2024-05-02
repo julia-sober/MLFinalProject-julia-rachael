@@ -190,7 +190,7 @@ def run_models(X, Y):
         Dense(100, activation="relu"),
         # Hidden layer with 100 neurons and relu activation
         Dense(100, activation="relu"),
-        # Output layer with 8 neurons for 8 classes and softmax activation
+        # Output layer with 7 neurons for 7 classes and softmax activation
         Dense(8, activation="softmax")
     ]
 
