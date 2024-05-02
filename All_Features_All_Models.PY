@@ -18,6 +18,7 @@ import os
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
+from sklearn import metrics
 from sklearn.model_selection import LeaveOneOut, train_test_split, KFold
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
@@ -37,7 +38,7 @@ def main():
     light_couscous_features = wav_to_audio_features("microphone-sampling/TestingSamples/lightCouscousHail/")
     mason_rain_features = wav_to_audio_features("microphone-sampling/TestingSamples/MasonJarRain/")
     nothing_features = wav_to_audio_features("microphone-sampling/TestingSamples/Nothing/")
-    watering_can_features = wav_to_audio_features("microphone-sampling/TestingSamples/WateringCan/")
+    #watering_can_features = wav_to_audio_features("microphone-sampling/TestingSamples/WateringCan/")
     real_snow_features = wav_to_audio_features("microphone-sampling/TestingSamples/RealSnow/")
 
     #--------------------Create Labels for Light, Medium, Heavy, etc.-------------------------------------
@@ -47,17 +48,17 @@ def main():
     light_couscous_labels = np.full(len(light_couscous_features), "light couscous hail")
     mason_rain_labels = np.full(len(mason_rain_features), "mason jar rain")
     nothing_labels = np.full(len(nothing_features), "nothing")
-    watering_can_labels = np.full(len(watering_can_features), "watering can")
+    #watering_can_labels = np.full(len(watering_can_features), "watering can")
     real_snow_labels = np.full(len(real_snow_features), "real snow")
 
     #----------------------Concatenating the features and labels into X (features) and Y (labels)----------------
     # Concatenate together the 8 NumPy arrays into one array, which will be the features array
     X = np.concatenate([light_rain_features, medium_rain_features, heavy_couscous_features,
-                        light_couscous_features, mason_rain_features, nothing_features, watering_can_features, real_snow_features], axis=0)
+                        light_couscous_features, mason_rain_features, nothing_features, real_snow_features], axis=0)
     # Concatenate together the 8 NumPy LABEL arrays into one array, which will be the target array
     Y = np.concatenate(
         [light_rain_labels, med_rain_labels, heavy_couscous_labels, light_couscous_labels,
-         mason_rain_labels, nothing_labels, watering_can_labels, real_snow_labels], axis=0)
+         mason_rain_labels, nothing_labels, real_snow_labels], axis=0)
     df = pd.DataFrame(X)
     df['target'] = Y
 
@@ -158,6 +159,7 @@ def run_models(X, Y):
     # Performing SVM, RF, and XGBoost algorithms with and without leave one out cross validation
     # and recording the accuracies
     all_accuracies = []
+    all_roc = []
 
     #feature_names = ["ACC", "ZCR", "Ht", "Hf", "ACI", "SC"]
     feature_names = [f"feature{i}" for i in range(X.shape[1])]
@@ -168,6 +170,7 @@ def run_models(X, Y):
 
     loo = LeaveOneOut()
     accuracies = []
+
     for train_index, test_index in loo.split(X):
         X_train, X_test = X[train_index], X[test_index]
         Y_train, Y_test = Y[train_index], Y[test_index]

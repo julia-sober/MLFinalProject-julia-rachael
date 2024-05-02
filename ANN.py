@@ -35,7 +35,7 @@ def main():
     medium_rain_features = wav_to_audio_features("microphone-sampling/TestingSamples/mediumShower/")
     heavy_couscous_features = wav_to_audio_features("microphone-sampling/TestingSamples/heavyCouscousHail/")
     light_couscous_features = wav_to_audio_features("microphone-sampling/TestingSamples/lightCouscousHail/")
-    mason_rain_features = wav_to_audio_features("microphone-sampling/TestingSamples/MasonJarRain/")
+    #mason_rain_features = wav_to_audio_features("microphone-sampling/TestingSamples/MasonJarRain/")
     nothing_features = wav_to_audio_features("microphone-sampling/TestingSamples/Nothing/")
     watering_can_features = wav_to_audio_features("microphone-sampling/TestingSamples/WateringCan/")
     real_snow_features = wav_to_audio_features("microphone-sampling/TestingSamples/RealSnow/")
@@ -45,7 +45,7 @@ def main():
     med_rain_labels = np.full(len(medium_rain_features), 1)
     heavy_couscous_labels = np.full(len(heavy_couscous_features), 2)
     light_couscous_labels = np.full(len(light_couscous_features), 3)
-    mason_rain_labels = np.full(len(mason_rain_features), 4)
+    #mason_rain_labels = np.full(len(mason_rain_features), 4)
     nothing_labels = np.full(len(nothing_features), 5)
     watering_can_labels = np.full(len(watering_can_features), 6)
     real_snow_labels = np.full(len(real_snow_features), 7)
@@ -53,12 +53,12 @@ def main():
     # ----------------------Concatenating the features and labels into X (features) and Y (labels)----------------
     # Concatenate together the 8 NumPy arrays into one array, which will be the features array
     X = np.concatenate([light_rain_features, medium_rain_features, heavy_couscous_features,
-                        light_couscous_features, mason_rain_features, nothing_features, watering_can_features,
+                        light_couscous_features, nothing_features, watering_can_features,
                         real_snow_features], axis=0)
     # Concatenate together the 8 NumPy LABEL arrays into one array, which will be the target array
     Y = np.concatenate(
         [light_rain_labels, med_rain_labels, heavy_couscous_labels, light_couscous_labels,
-         mason_rain_labels, nothing_labels, watering_can_labels, real_snow_labels], axis=0)
+         nothing_labels, watering_can_labels, real_snow_labels], axis=0)
     df = pd.DataFrame(X)
     df['target'] = Y
 
@@ -182,8 +182,6 @@ def run_models(X, Y):
 
     layers = [
         Flatten(),
-        # Hidden layer with 100 neurons and relu activation
-        Dense(100, activation="relu"),
         # Hidden layer with 100 neurons and relu activation
         Dense(100, activation="relu"),
         # Hidden layer with 100 neurons and relu activation
